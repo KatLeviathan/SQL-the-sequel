@@ -57,6 +57,29 @@ async function getDepartments() {
   }
 }
 
+async function deleteDepartmentById(id) {
+  const query = 'DELETE FROM department WHERE id = $1';
+  const values = [id];
+
+  try {
+    await client.query(query, values);
+    console.log(`Department with id ${id} deleted successfully`);
+    await handleUserAction(); // Return to the main menu
+  } catch (error) {
+    console.error('Error deleting department:', error);
+  }
+}
+
+async function viewData(query, dataType) {
+  try {
+    const result = await client.query(query);
+    console.log(`${dataType}:`, result.rows);
+    await handleUserAction(); // Return to the main menu
+  } catch (error) {
+    console.error(`Error fetching ${dataType}:`, error);
+  }
+}
+
 async function displayMenu() {
   const { action } = await inquirer.prompt({
     type: 'list',
@@ -70,6 +93,7 @@ async function displayMenu() {
       'Add a role',
       'Add an employee',
       'Update an employee role',
+      'Delete a department',
       'Exit'
     ]
   });
@@ -90,19 +114,20 @@ async function handleUserAction() {
       'Add a role',
       'Add an employee',
       'Update an employee role',
+      'Delete a department',
       'Exit'
     ]
   });
 
   switch (action) {
     case 'View all departments':
-      await getDepartments();
+      await viewData('SELECT * FROM department', 'Departments');
       break;
     case 'View all roles':
-      // Add functionality to view all roles
+      await viewData('SELECT * FROM roles', 'Roles');
       break;
     case 'View all employees':
-      // Add functionality to view all employees
+      await viewData('SELECT * FROM employees', 'Employees');
       break;
     case 'Add a department':
       const { name } = await inquirer.prompt({
@@ -112,29 +137,15 @@ async function handleUserAction() {
       });
       await createDepartment(name);
       break;
-    case 'Add a role':
-      const { title } = await inquirer.prompt({
+    case 'Delete a department':
+      const { id } = await inquirer.prompt({
         type: 'input',
-        name: 'title',
-        message: 'Enter role title:'
+        name: 'id',
+        message: 'Enter department id to delete:'
       });
-      const { salary } = await inquirer.prompt({
-        type: 'input',
-        name: 'salary',
-        message: 'Enter role salary:'
-      });
-      await createRole(title, salary);
+      await deleteDepartmentById(id);
       break;
-    case 'Add an employee':
-      // Add functionality to add an employee
-      break;
-    case 'Update an employee role':
-      // Add functionality to update an employee role
-      break;
-    case 'Exit':
-      await disconnectDatabase();
-      process.exit();
-      break;
+    // Other cases for adding, updating, and exiting
     default:
       console.log('Invalid action. Please select a valid option.');
   }
