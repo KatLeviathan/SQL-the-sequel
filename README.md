@@ -11,6 +11,7 @@ This project will help be a great reference for any future Data i may need to he
 ## Installation
 
 -npm i express pg in terminal
+-npm i inquirer@8.2.4
 -node index.js in console
 follow instructions to add, view or delete table info.
 
