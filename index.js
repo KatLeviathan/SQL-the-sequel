@@ -231,72 +231,84 @@ async function displayMenu() {
 async function addEmployee() {
   try {
     const { firstName } = await inquirer.prompt({
-      type: 'input',
-      name: 'firstName',
-      message: 'Enter employee first name:'
+      type: "input",
+      name: "firstName",
+      message: "Enter employee first name:",
     });
 
     const { lastName } = await inquirer.prompt({
-      type: 'input',
-      name: 'lastName',
-      message: 'Enter employee last name:'
+      type: "input",
+      name: "lastName",
+      message: "Enter employee last name:",
     });
 
-    const departments = await client.query('SELECT id, name FROM department');
-    const departmentChoices = departments.rows.map(department => department.name);
+    const departments = await client.query("SELECT id, name FROM department");
+    const departmentChoices = departments.rows.map(
+      (department) => department.name
+    );
 
     const { departmentName } = await inquirer.prompt({
-      type: 'list',
-      name: 'departmentName',
-      message: 'Select the department for the employee:',
-      choices: departmentChoices
+      type: "list",
+      name: "departmentName",
+      message: "Select the department for the employee:",
+      choices: departmentChoices,
     });
 
-    const selectedDepartment = departments.rows.find(department => department.name === departmentName);
+    const selectedDepartment = departments.rows.find(
+      (department) => department.name === departmentName
+    );
 
-    const roles = await client.query('SELECT id, title FROM role WHERE department_id = $1', [selectedDepartment.id]);
-    const roleChoices = roles.rows.map(role => role.title);
+    const roles = await client.query(
+      "SELECT id, title FROM role WHERE department_id = $1",
+      [selectedDepartment.id]
+    );
+    const roleChoices = roles.rows.map((role) => role.title);
 
     const { roleName } = await inquirer.prompt({
-      type: 'list',
-      name: 'roleName',
-      message: 'Select the role for the employee:',
-      choices: roleChoices
+      type: "list",
+      name: "roleName",
+      message: "Select the role for the employee:",
+      choices: roleChoices,
     });
 
-    const selectedRole = roles.rows.find(role => role.title === roleName);
+    const selectedRole = roles.rows.find((role) => role.title === roleName);
 
     // Fetch employees in the selected department to choose as manager
-    const employeesInDepartment = await client.query(`
+    const employeesInDepartment = await client.query(
+      `
       SELECT id, first_name, last_name FROM employee WHERE role_id IN (
         SELECT id FROM role WHERE department_id = $1
       );
-    `, [selectedDepartment.id]);
+    `,
+      [selectedDepartment.id]
+    );
 
-    const managerChoices = employeesInDepartment.rows.map(employee => ({
+    const managerChoices = employeesInDepartment.rows.map((employee) => ({
       name: `${employee.first_name} ${employee.last_name}`,
-      value: employee.id
+      value: employee.id,
     }));
-    managerChoices.unshift({ name: 'None', value: null });
+    managerChoices.unshift({ name: "None", value: null });
 
     const { managerId } = await inquirer.prompt({
-      type: 'list',
-      name: 'managerId',
-      message: 'Select the manager for the employee:',
-      choices: managerChoices
+      type: "list",
+      name: "managerId",
+      message: "Select the manager for the employee:",
+      choices: managerChoices,
     });
 
-    const query = 'INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)';
+    const query =
+      "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ($1, $2, $3, $4)";
     const values = [firstName, lastName, selectedRole.id, managerId];
 
     await client.query(query, values);
-    console.log(`Employee ${firstName} ${lastName} added successfully to department ${departmentName}`);
+    console.log(
+      `Employee ${firstName} ${lastName} added successfully to department ${departmentName}`
+    );
     await handleUserAction(); // Return to the main menu
   } catch (error) {
-    console.error('Error adding employee:', error);
+    console.error("Error adding employee:", error);
   }
 }
-
 
 async function addRole() {
   try {
