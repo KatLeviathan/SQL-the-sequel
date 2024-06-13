@@ -13,3 +13,7 @@ This project will help be a great reference for any future Data i may need to he
 -npm i express pg in terminal
 -node index.js in console
 follow instructions to add, view or delete table info.
+
+
+Test Video: [index.js - SQL-the-sequel - Visual Studio Code 2024-06-13 12-59-35.zip](https://github.com/user-attachments/files/15826035/index.js.-.SQL-the-sequel.-.Visual.Studio.Code.2024-06-13.12-59-35.zip)
+
