@@ -1,6 +1,6 @@
 const { Client } = require("pg");
 const inquirer = require("inquirer");
-const { table } = require("table");
+
 
 const client = new Client({
   user: "postgres",
